@@ -15,15 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get Python version
-        run: |
-          PYTHON_VERSION=$(cat .python_version)
-          echo "Python Version: $PYTHON_VERSION"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: $PYTHON_VERSION
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |

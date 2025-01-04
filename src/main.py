@@ -1,3 +1,5 @@
+"""Application main entrypoint."""
+
 import os
 
 from qiskit import QuantumCircuit
@@ -6,11 +8,10 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 
 api_token = os.getenv("IBMQ_API_KEY")
 
+
 def setup_test():
-    service = QiskitRuntimeService(
-        channel="ibm_quantum", 
-        token=api_token
-    )
+    """Checks that the repository is setup and configured correctly."""
+    service = QiskitRuntimeService(channel="ibm_quantum", token=api_token)
 
     backend = service.least_busy(operational=True, simulator=False)
 

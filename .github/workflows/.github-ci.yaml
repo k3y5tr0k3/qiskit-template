@@ -17,7 +17,7 @@ jobs:
 
       - name: Get Python version
         run: |
-          PYTHON_VERSION=$(cat my_file.txt)
+          PYTHON_VERSION=$(cat .python_version)
           echo "Python Version: $PYTHON_VERSION"
 
       - name: Set up Python

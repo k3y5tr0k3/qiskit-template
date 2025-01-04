@@ -26,7 +26,9 @@ jobs:
           pip install -r test-requirements.txt
 
       - name: Run pytest
-        run: pytest
+        run: |
+          IBMQ_API_KEY=$(echo ${{ secrets.IBMQ_API_KEY }})
+          pytest
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4

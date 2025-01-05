@@ -8,10 +8,10 @@ from src.utils.logging import Logging
 pytest.__version__
 
 
-class Test_Logging:
+class TestLogging:
     """Test custom logging class."""
 
-    def test_get_logger(self):
+    def test_get_logger__success(self):
         """Tests get_logger method. Simply checks that None is not returned."""
         logger = Logging.get_logger()
 

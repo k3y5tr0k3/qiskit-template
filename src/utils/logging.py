@@ -3,6 +3,8 @@
 import logging
 import logging.config
 
+from src.utils.config import Config
+
 
 class Logging:
     """Custom logging configuration class."""
@@ -43,4 +45,5 @@ class Logging:
     def get_logger():
         """Return the custom logger."""
         logging.config.dictConfig(Logging.LOGGING_CONFIG)
-        return logging.getLogger(__name__)
+        log_level = Config.get("logging.level")
+        return logging.getLogger(__name__).setLevel(log_level)

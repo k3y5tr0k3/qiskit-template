@@ -1,1 +1,1 @@
-"""Package containing the tests for the project."""
+"""Package containing the tests for src modules."""

@@ -3,6 +3,8 @@
 import logging
 import logging.config
 
+from src.utils.config import Config
+
 
 class Logging:
     """Custom logging configuration class."""
@@ -18,7 +20,6 @@ class Logging:
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "level": "DEBUG",
                 "formatter": "default",
                 "stream": "ext://sys.stdout",
             },
@@ -34,7 +35,6 @@ class Logging:
         "loggers": {
             "": {
                 "handlers": ["console", "file"],
-                "level": "DEBUG",
             },
         },
     }
@@ -43,4 +43,7 @@ class Logging:
     def get_logger():
         """Return the custom logger."""
         logging.config.dictConfig(Logging.LOGGING_CONFIG)
-        return logging.getLogger(__name__)
+        log_level = Config.get("logging.level")
+        logger = logging.getLogger(__name__)
+        logger.setLevel(log_level)
+        return logger

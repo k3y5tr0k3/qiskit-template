@@ -3,11 +3,6 @@
 import tomllib
 import pathlib
 
-from src.utils.logging import Logging
-
-
-logger = Logging.get_logger()
-
 
 class Config:
     """Class that handles the retrieval of application configuration."""
@@ -40,12 +35,10 @@ class Config:
                     return tomllib.load(f)
 
             except tomllib.TomlDecodeError as e:
-                logger.exception(f"Error decoding config.toml: {e}")
-                return None
+                raise tomllib.TomlDecodeError(f"Error decoding config.toml: {e}")
 
         else:
-            logger.exception("Error: config.toml not found.")
-            return None
+            raise FileNotFoundError("Error: config.toml not found.")
 
     @staticmethod
     def get(name):

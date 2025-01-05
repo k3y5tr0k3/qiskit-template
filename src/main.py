@@ -94,4 +94,4 @@ def setup_test():
 
 if __name__ == "__main__":
     result = setup_test()
-    logger.info(f"Result: {result}")
+    print(f"Result: {result}")

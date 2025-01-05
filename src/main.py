@@ -2,13 +2,15 @@
 
 import os
 
+from src.utils.config import Config
 from src.utils.logging import Logging
 
-from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator
+from qiskit import QuantumCircuit, transpile
 from qiskit.circuit.exceptions import CircuitError
 from qiskit.providers.exceptions import QiskitBackendNotFoundError
-from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.accounts.exceptions import AccountNotFoundError
+from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import (
     RuntimeJobFailureError,
     RuntimeJobMaxTimeoutError,
@@ -29,32 +31,37 @@ except AssertionError:
 
 def setup_test():
     """Checks that the repository is setup and configured correctly."""
+    result = None
+
+    example_circuit = None
     try:
-        service = QiskitRuntimeService(channel="ibm_quantum", token=API_TOKEN)
-    except AccountNotFoundError:
+        example_circuit = QuantumCircuit(2)
+        example_circuit.measure_all()
+    except CircuitError:
         logger.exception(
-            "Failed to instantiate Qiskit Runtime Service. Check that API"
-            "token is set and is correct."
+            "Failed to instantiate QuantumCircuit. Either the circuit "
+            "name, if given, is not valid, or both inputs and "
+            "captures are given."
         )
         exit(101)
 
-    else:
+    simulate = Config.get("environment.simulate")
+
+    if not simulate:
         try:
-            backend = service.least_busy(operational=True, simulator=False)
-        except QiskitBackendNotFoundError:
-            logger.exception("No Qiskit backend found that matches the criteria.")
+            service = QiskitRuntimeService(channel="ibm_quantum", token=API_TOKEN)
+        except AccountNotFoundError:
+            logger.exception(
+                "Failed to instantiate Qiskit Runtime Service. Check that API"
+                "token is set and is correct."
+            )
             exit(102)
 
         else:
             try:
-                example_circuit = QuantumCircuit(2)
-                example_circuit.measure_all()
-            except CircuitError:
-                logger.exception(
-                    "Failed to instantiate QuantumCircuit. Either the circuit "
-                    "name, if given, is not valid, or both inputs and "
-                    "captures are given."
-                )
+                backend = service.least_busy(operational=True, simulator=False)
+            except QiskitBackendNotFoundError:
+                logger.exception("No Qiskit backend found that matches the criteria.")
                 exit(103)
 
             else:
@@ -68,7 +75,6 @@ def setup_test():
                 else:
                     logger.info(f"Job id: {job.job_id()}.")
 
-                    result = None
                     try:
                         result = job.result()
                     except RuntimeJobFailureError as e:
@@ -78,9 +84,14 @@ def setup_test():
                     except RuntimeInvalidStateError as e:
                         logger.exception(f"{e}")
 
-                    return result
+    else:
+        backend = AerSimulator()
+        job = backend.run(transpile(example_circuit, backend))
+        result = job.result()
+
+    return result
 
 
 if __name__ == "__main__":
     result = setup_test()
-    print(result)
+    logger.info(f"Result: {result}")

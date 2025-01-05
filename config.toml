@@ -1,2 +1,5 @@
 [environment]
 simulate = true
+
+[logging]
+level = "INFO"

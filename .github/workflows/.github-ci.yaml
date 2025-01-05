@@ -20,6 +20,29 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Get Python Version
+        id: python-version
+        run: echo "::set-output name=version::$(python --version | awk '{print $2}')"
+
+      - name: Create Python Version Badge
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const version = github.context.actions.outputs['python-version'];
+            const badgeUrl = `https://img.shields.io/badge/python-${version}-blue.svg`;
+            console.log(`::set-output name=badgeUrl::${badgeUrl}`);
+
+      - name: Add Python Version Badge to README
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const badgeUrl = github.context.actions.outputs['badgeUrl'];
+            const readmePath = '.github/README.md';
+            const readmeContent = core.getInput('readmeContent');
+            const newReadmeContent = readmeContent.replace(/<!-- python-version-badge -->/, `![Python Version](${badgeUrl})`);
+            core.setOutput('newReadmeContent', newReadmeContent);
+            core.writeFile(readmePath, newReadmeContent);
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

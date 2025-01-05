@@ -4,6 +4,7 @@ import os
 
 from qiskit import QuantumCircuit
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
+from qiskit_ibm_runtime.accounts.exceptions import AccountNotFoundError
 
 
 api_token = os.getenv("IBMQ_API_KEY")
@@ -11,7 +12,10 @@ api_token = os.getenv("IBMQ_API_KEY")
 
 def setup_test():
     """Checks that the repository is setup and configured correctly."""
-    service = QiskitRuntimeService(channel="ibm_quantum", token=api_token)
+    try:
+        service = QiskitRuntimeService(channel="ibm_quantum", token=api_token)
+    except AccountNotFoundError:
+        print(f"API_KEY: {api_token[0:6]}")
 
     backend = service.least_busy(operational=True, simulator=False)
 
